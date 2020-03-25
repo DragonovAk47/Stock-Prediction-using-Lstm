@@ -14,11 +14,6 @@ import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 # Input data files are available in the "../input/" directory.
 # For example, running this (by clicking run or pressing Shift+Enter) will list all files under the input directory
 
-import os
-for dirname, _, filenames in os.walk('/kaggle/input'):
-    for filename in filenames:
-        print(os.path.join(dirname, filename))
-
 # Any results you write to the current directory are saved as output.
 
 
@@ -67,7 +62,6 @@ def arrange(data):
 # In[31]:
 
 
-X,Y = preprocess(data)
 
 
 # In[32]:
@@ -119,8 +113,9 @@ def result(df):
 
 # In[36]:
 
-
-result(md)
+print("---------------HangSeng Index PREDICTION AND ANALYSIS FROM 2008-07-01 TO 2016-09-30----------------------")
+hangseng_stock = md['Closing Price']
+result(np.array(hangseng_stock).reshape(-1,1))
 
 
 # In[37]:
@@ -147,7 +142,7 @@ result(np.array(stock).reshape(-1,1))
 
 # In[63]:
 
-
+print("--------------TODAY'S PREDICTION AND ANALYSIS--------------------")
 
 def pred(msft):
     stock = msft.history(period="max")[-3:-1]['Close']
@@ -174,9 +169,24 @@ def pred(msft):
         print( "decrease")
 pred(msft)
 
-
+print("---------------NEXT DAY PREDICTION--------------------")
 # In[ ]:
-
+def next_day(msft):
+    stock = msft.history(period="max")[-2:]['Close']
+    stocks = np.array(stock).reshape(1,2)
+    stocks = np.array(stocks)
+    stocks_mean = (stocks[0,0] + stocks[0,1])/2
+    stocks = (stocks-stocks_mean)/2
+    x = stocks.reshape(stocks.shape[0] , 1 ,stocks.shape[1])
+    y_pred = model.predict(x) + stocks_mean
+    print(y_pred)
+    difference = y_pred - stock[-1:].values
+    print("next day prediction : ")
+    if difference>0:
+        print( "increase")
+    else:
+        print( "decrease")
+next_day(msft)
 
 
 
